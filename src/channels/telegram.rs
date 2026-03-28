@@ -1461,11 +1461,14 @@ Allowlist Telegram username (without '@') or numeric user ID.",
             .and_then(serde_json::Value::as_i64)
             .map(|id| id.to_string());
 
-        // reply_target: chat_id or chat_id:thread_id format
+        // reply_target: encode conversation scope including sender for isolation.
+        // - DM: chat_id:sender_id (unique per user DM)
+        // - Forum topic: chat_id:topic_id:sender_id (unique per user per topic)
+        // - Regular group: chat_id:sender_id (shared group, but user isolated)
         let reply_target = if let Some(ref tid) = thread_id {
-            format!("{}:{}", chat_id, tid)
+            format!("{}:{}:{}", chat_id, tid, sender_identity)
         } else {
-            chat_id.clone()
+            format!("{}:{}", chat_id, sender_identity)
         };
 
         let content = if self.mention_only && is_group {
@@ -3369,7 +3372,7 @@ mod tests {
             .expect("message should parse");
 
         assert_eq!(msg.sender, "alice");
-        assert_eq!(msg.reply_target, "-100200300");
+        assert_eq!(msg.reply_target, "-100200300:alice");
         assert_eq!(msg.content, "hello");
         assert_eq!(msg.id, "telegram_-100200300_33");
     }
@@ -3396,7 +3399,7 @@ mod tests {
             .expect("numeric allowlist should pass");
 
         assert_eq!(msg.sender, "555");
-        assert_eq!(msg.reply_target, "12345");
+        assert_eq!(msg.reply_target, "12345:555");
     }
 
     #[test]
@@ -3423,7 +3426,7 @@ mod tests {
             .expect("message with thread_id should parse");
 
         assert_eq!(msg.sender, "alice");
-        assert_eq!(msg.reply_target, "-100200300:789");
+        assert_eq!(msg.reply_target, "-100200300:789:alice");
         assert_eq!(msg.content, "hello from topic");
         assert_eq!(msg.id, "telegram_-100200300_42");
     }

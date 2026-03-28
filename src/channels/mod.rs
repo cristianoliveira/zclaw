@@ -436,14 +436,15 @@ fn conversation_memory_key(msg: &traits::ChannelMessage) -> String {
 }
 
 fn conversation_history_key(msg: &traits::ChannelMessage) -> String {
-    // Include reply_target for per-channel isolation (e.g. distinct Discord/Slack
-    // channels) and thread_ts for per-topic isolation in forum groups.
+    // Include reply_target for conversation isolation. Channels that need
+    // sender-level isolation (e.g., Telegram) encode it in reply_target.
+    // thread_ts provides additional per-topic isolation for threaded channels.
     match &msg.thread_ts {
         Some(tid) => format!(
-            "{}_{}_{}_{}",
-            msg.channel, msg.reply_target, tid, msg.sender
+            "{}_{}_{}",
+            msg.channel, msg.reply_target, tid
         ),
-        None => format!("{}_{}_{}", msg.channel, msg.reply_target, msg.sender),
+        None => format!("{}_{}", msg.channel, msg.reply_target),
     }
 }
 
@@ -452,12 +453,13 @@ fn followup_thread_id(msg: &traits::ChannelMessage) -> Option<String> {
 }
 
 fn interruption_scope_key(msg: &traits::ChannelMessage) -> String {
+    // reply_target already encodes sender for channels that need it
     match &msg.interruption_scope_id {
         Some(scope) => format!(
-            "{}_{}_{}_{}",
-            msg.channel, msg.reply_target, msg.sender, scope
+            "{}_{}_{}",
+            msg.channel, msg.reply_target, scope
         ),
-        None => format!("{}_{}_{}", msg.channel, msg.reply_target, msg.sender),
+        None => format!("{}_{}", msg.channel, msg.reply_target),
     }
 }
 
