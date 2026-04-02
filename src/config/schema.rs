@@ -6382,6 +6382,7 @@ fn default_matrix_draft_update_interval_ms() -> u64 {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct TelegramConfig {
     /// Telegram Bot API token (from @BotFather).
+    /// Can also be set via `ZEROCLAW_TELEGRAM_BOT_TOKEN` environment variable.
     pub bot_token: String,
     /// Allowed Telegram user IDs or usernames. Empty = deny all.
     pub allowed_users: Vec<String>,

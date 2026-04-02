@@ -3766,6 +3766,7 @@ fn setup_channels(existing: Option<ChannelsConfig>) -> Result<ChannelsConfig> {
                 print_bullet("1. Open Telegram and message @BotFather");
                 print_bullet("2. Send /newbot and follow the prompts");
                 print_bullet("3. Copy the bot token and paste it below");
+                print_bullet("   (Or skip to use ZEROCLAW_TELEGRAM_BOT_TOKEN environment variable)");
                 println!();
 
                 let has_existing_tg = config.telegram.is_some();

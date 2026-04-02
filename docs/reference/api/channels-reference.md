@@ -160,6 +160,7 @@ interrupt_on_new_message = false  # optional: cancel in-flight same-sender same-
 
 Telegram notes:
 
+- `bot_token` can also be set via the `ZEROCLAW_TELEGRAM_BOT_TOKEN` environment variable, which takes precedence over the config file value.
 - `interrupt_on_new_message = true` preserves interrupted user turns in conversation history, then restarts generation on the newest message.
 - Interruption scope is strict: same sender in the same chat. Messages from different chats are processed independently.
 
